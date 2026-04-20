@@ -16,9 +16,9 @@ from utils.data_loader import get_dataset
 from utils.models import train_model, predict_batch
 from utils.features import MSCORE_THRESHOLD
 
-st.set_page_config(page_title="Insights", page_icon="💡", layout="wide")
+st.set_page_config(page_title="Insights", layout="wide")
 
-st.title("💡 Insights")
+st.title("Insights")
 st.caption("How does human intuition compare to the machine learning model?")
 st.markdown("---")
 
@@ -26,7 +26,7 @@ st.markdown("---")
 results = st.session_state.get("game_results", [])
 
 if not results:
-    st.info("👈 Play the **Game** first to generate data. Come back here afterwards to see how you did!")
+    st.info("Play the **Game** first to generate data. Come back here afterwards to see how you did!")
 
     # Show model-level stats regardless
     st.markdown("---")
@@ -116,9 +116,9 @@ display = results_df[["firm", "actual", "user_pred", "user_confidence", "model_p
                         "human_correct", "model_correct"]].copy()
 display.columns = ["Firm", "Actual", "Your Guess", "Confidence", "Model Guess", "Model Prob",
                    "You Correct", "Model Correct"]
-display["Actual"] = display["Actual"].map({1: "🚨 Fraud", 0: "✅ Clean"})
-display["Your Guess"] = display["Your Guess"].map({1: "🚨 Fraud", 0: "✅ Clean"})
-display["Model Guess"] = display["Model Guess"].map({1: "🚨 Fraud", 0: "✅ Clean"})
+display["Actual"] = display["Actual"].map({1: "Fraud", 0: "Clean"})
+display["Your Guess"] = display["Your Guess"].map({1: "Fraud", 0: "Clean"})
+display["Model Guess"] = display["Model Guess"].map({1: "Fraud", 0: "Clean"})
 display["Model Prob"] = display["Model Prob"].map("{:.0%}".format)
 display["Confidence"] = display["Confidence"].map("{}%".format)
 display["You Correct"] = display["You Correct"].map({1: "✓", 0: "✗"})

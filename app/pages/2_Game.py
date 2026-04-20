@@ -16,7 +16,7 @@ from utils.data_loader import get_dataset, get_game_sample
 from utils.models import train_model, predict_batch
 from utils.features import FEATURE_COLS, FEATURE_DESCRIPTIONS, mscore_label, mscore_color
 
-st.set_page_config(page_title="Game", page_icon="🎮", layout="wide")
+st.set_page_config(page_title="Game", layout="wide")
 
 # ── Load data & model ────────────────────────────────────────────────────────
 @st.cache_data
@@ -47,7 +47,7 @@ total_rounds = len(game_df)
 idx = st.session_state.game_idx
 
 # ── Page header ───────────────────────────────────────────────────────────────
-st.title("🎮 Human vs. Model")
+st.title("Human vs. Model")
 st.caption("Can you spot financial fraud? Review the financial ratios and make your call — then see what the model thinks.")
 
 # ── Progress bar ──────────────────────────────────────────────────────────────
@@ -58,7 +58,7 @@ st.markdown("---")
 
 # ── Game over screen ──────────────────────────────────────────────────────────
 if idx >= total_rounds:
-    st.success("🎉 You've completed all rounds! Head to the **Insights** page to see how you did.")
+    st.success("You've completed all rounds! Head to the **Insights** page to see how you did.")
     results_df = pd.DataFrame(st.session_state.game_results)
 
     human_acc = (results_df["human_correct"]).mean()
@@ -68,7 +68,7 @@ if idx >= total_rounds:
     c1.metric("Your Accuracy", f"{human_acc:.0%}")
     c2.metric("Model Accuracy", f"{model_acc:.0%}")
 
-    if st.button("🔄 Play Again"):
+    if st.button("Play Again"):
         st.session_state.game_df = get_game_sample(df_full, n=10, seed=completed + 1)
         st.session_state.game_idx = 0
         st.session_state.game_results = []
@@ -108,7 +108,7 @@ with col_table:
     ratio_df = pd.DataFrame({
         "Ratio": FEATURE_COLS,
         "Value": [f"{firm[f]:.3f}" for f in FEATURE_COLS],
-        "Signal": ["⚠️ High" if firm[f] > 1.15 else "↑ Elevated" if firm[f] > 1.0 else "✅ Normal"
+        "Signal": ["High" if firm[f] > 1.15 else "↑ Elevated" if firm[f] > 1.0 else "Normal"
                    for f in FEATURE_COLS],
     })
     st.dataframe(ratio_df, use_container_width=True, hide_index=True)
@@ -127,7 +127,7 @@ if not st.session_state.revealed:
     with col_guess:
         user_choice = st.radio(
             "Is this company committing fraud?",
-            options=["🚨 Fraud", "✅ Not Fraud"],
+            options=["Fraud", "Not Fraud"],
             horizontal=True,
         )
     with col_conf:
@@ -141,7 +141,7 @@ if not st.session_state.revealed:
 
 # ── Reveal ────────────────────────────────────────────────────────────────────
 if st.session_state.revealed:
-    user_choice = st.session_state.get("user_choice", "✅ Not Fraud")
+    user_choice = st.session_state.get("user_choice", "Not Fraud")
     confidence = st.session_state.get("user_conf", 70)
     user_pred = 1 if "Fraud" in user_choice and "Not" not in user_choice else 0
 
@@ -170,18 +170,18 @@ if st.session_state.revealed:
     st.subheader("Results Revealed")
 
     r1, r2, r3 = st.columns(3)
-    actual_str = "🚨 FRAUD" if actual == 1 else "✅ CLEAN"
+    actual_str = "FRAUD" if actual == 1 else "CLEAN"
     r1.metric("Actual Label", actual_str)
-    r2.metric("Your Answer", "🚨 Fraud" if user_pred == 1 else "✅ Not Fraud",
+    r2.metric("Your Answer", "Fraud" if user_pred == 1 else "Not Fraud",
               delta="✓ Correct" if human_correct else "✗ Wrong",
               delta_color="normal" if human_correct else "inverse")
-    r3.metric("Model Answer", f"{'🚨 Fraud' if model_pred == 1 else '✅ Not Fraud'} ({model_prob:.0%})",
+    r3.metric("Model Answer", f"{'Fraud' if model_pred == 1 else 'Not Fraud'} ({model_prob:.0%})",
               delta="✓ Correct" if model_correct else "✗ Wrong",
               delta_color="normal" if model_correct else "inverse")
 
     st.markdown(f"**Beneish M-Score:** `{mscore:.3f}` — {mscore_label(mscore)}")
     if firm["scandal"]:
-        st.warning(f"📋 **Known scandal:** {firm['scandal']}")
+        st.warning(f"**Known scandal:** {firm['scandal']}")
 
     if st.button("Next Company →", type="primary", use_container_width=True):
         st.session_state.game_idx += 1

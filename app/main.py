@@ -1,6 +1,5 @@
 """
 Financial Fraud Detection Web App
-BA870-AC820 | Spring 2026
 
 Run with:  streamlit run app/main.py
 """
@@ -41,8 +40,7 @@ st.session_state["model"] = model
 st.session_state["scaler"] = scaler
 
 # ── Home page ────────────────────────────────────────────────────────────────
-st.title("🔍 Financial Fraud Detection")
-st.markdown("**BA870-AC820 | Spring 2026**")
+st.title("Financial Fraud Detection Analysis App")
 
 st.markdown("---")
 

@@ -1,5 +1,7 @@
 """
-Financial Fraud Detection Analysis App
+Financial Fraud Detection Web App
+BA870-AC820 | Spring 2026
+
 Run with:  streamlit run app/main.py
 """
 
@@ -14,6 +16,7 @@ from utils.models import train_model, predict_batch
 
 st.set_page_config(
     page_title="Fraud Detector",
+    page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -39,7 +42,8 @@ st.session_state["model"] = model
 st.session_state["scaler"] = scaler
 
 # ── Home page ────────────────────────────────────────────────────────────────
-st.title("Financial Fraud Detection Analysis App")
+st.title("🔍 Financial Fraud Detection")
+st.markdown("**BA870-AC820 | Spring 2026**")
 
 st.markdown("---")
 
@@ -64,9 +68,9 @@ the machine learning model.
 
 | Page | What you can do |
 |------|----------------|
-| **Dashboard** | Explore fraud risk scores and key financial ratios for each firm |
-| **Game** | Try to identify fraudulent firms yourself — then compare with the model |
-| **Insights** | See how human intuition stacks up against data-driven predictions |
+| 📊 **Dashboard** | Explore fraud risk scores and key financial ratios for each firm |
+| 🎮 **Game** | Try to identify fraudulent firms yourself — then compare with the model |
+| 💡 **Insights** | See how human intuition stacks up against data-driven predictions |
 
 ---
 
@@ -95,4 +99,4 @@ It uses 8 financial ratios to detect earnings manipulation:
 Use the **sidebar** to navigate between pages.
 """)
 
-st.info("Select a page from the sidebar to get started.")
+st.info("👈 Select a page from the sidebar to get started.")

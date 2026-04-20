@@ -16,17 +16,17 @@ from utils.data_loader import get_dataset
 from utils.models import train_model, predict_batch
 from utils.features import MSCORE_THRESHOLD
 
-st.set_page_config(page_title="Insights", layout="wide")
+st.set_page_config(page_title="Insights", page_icon="💡", layout="wide")
 
-st.title("Model Performance Insights")
-st.caption("Accuracy summary and decision pattern analysis for the assessment session.")
+st.title("💡 Insights")
+st.caption("How does human intuition compare to the machine learning model?")
 st.markdown("---")
 
 # ── Check if game has been played ────────────────────────────────────────────
 results = st.session_state.get("game_results", [])
 
 if not results:
-    st.info("Complete the Fraud Assessment first. This page will display results once an assessment session has been run.")
+    st.info("👈 Play the **Game** first to generate data. Come back here afterwards to see how you did!")
 
     # Show model-level stats regardless
     st.markdown("---")
@@ -78,9 +78,9 @@ c3.metric("Model Accuracy", f"{model_acc:.0%}")
 c4.metric("Your Avg Confidence", f"{avg_conf:.0f}%")
 
 if human_acc > model_acc:
-    st.success(f"You beat the model! Your accuracy ({human_acc:.0%}) > Model ({model_acc:.0%})")
+    st.success(f"🏆 You beat the model! Your accuracy ({human_acc:.0%}) > Model ({model_acc:.0%})")
 elif human_acc == model_acc:
-    st.info(f"It's a tie! Both you and the model scored {human_acc:.0%}")
+    st.info(f"🤝 It's a tie! Both you and the model scored {human_acc:.0%}")
 else:
     diff = model_acc - human_acc
     st.warning(f"🤖 The model won this round by {diff:.0%}. Better luck next time!")
@@ -116,9 +116,9 @@ display = results_df[["firm", "actual", "user_pred", "user_confidence", "model_p
                         "human_correct", "model_correct"]].copy()
 display.columns = ["Firm", "Actual", "Your Guess", "Confidence", "Model Guess", "Model Prob",
                    "You Correct", "Model Correct"]
-display["Actual"] = display["Actual"].map({1: "Fraud", 0: "Clean"})
-display["Your Guess"] = display["Your Guess"].map({1: "Fraud", 0: "Clean"})
-display["Model Guess"] = display["Model Guess"].map({1: "Fraud", 0: "Clean"})
+display["Actual"] = display["Actual"].map({1: "🚨 Fraud", 0: "✅ Clean"})
+display["Your Guess"] = display["Your Guess"].map({1: "🚨 Fraud", 0: "✅ Clean"})
+display["Model Guess"] = display["Model Guess"].map({1: "🚨 Fraud", 0: "✅ Clean"})
 display["Model Prob"] = display["Model Prob"].map("{:.0%}".format)
 display["Confidence"] = display["Confidence"].map("{}%".format)
 display["You Correct"] = display["You Correct"].map({1: "✓", 0: "✗"})

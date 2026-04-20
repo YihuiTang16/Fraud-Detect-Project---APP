@@ -16,7 +16,7 @@ from utils.data_loader import get_dataset
 from utils.models import train_model, predict_batch, get_feature_importances
 from utils.features import FEATURE_COLS, FEATURE_DESCRIPTIONS, mscore_label, mscore_color, MSCORE_THRESHOLD
 
-st.set_page_config(page_title="Dashboard", layout="wide")
+st.set_page_config(page_title="Dashboard", page_icon="📊", layout="wide")
 
 # ── Load data ────────────────────────────────────────────────────────────────
 @st.cache_data
@@ -33,8 +33,8 @@ model, scaler, cv_scores = load_model(len(df))
 df = predict_batch(model, scaler, df)
 
 # ── Page header ──────────────────────────────────────────────────────────────
-st.title("Analytics Dashboard")
-st.caption("Beneish M-Score and logistic regression results for each company in the dataset.")
+st.title("📊 Analytics Dashboard")
+st.caption("Explore fraud risk scores and financial ratios for each company in the dataset.")
 st.markdown("---")
 
 # ── Summary metrics ──────────────────────────────────────────────────────────
@@ -86,7 +86,7 @@ row = df[df["company"] == selected].iloc[0]
 col_left, col_right = st.columns([1, 2])
 
 with col_left:
-    label = "FRAUD" if row["is_fraud"] == 1 else "CLEAN"
+    label = "🚨 FRAUD" if row["is_fraud"] == 1 else "✅ CLEAN"
     st.markdown(f"### {selected} ({int(row['year'])})")
     st.markdown(f"**Actual label:** {label}")
     st.markdown(f"**Sector:** {row['sector']}")
@@ -96,10 +96,10 @@ with col_left:
     risk = mscore_label(m)
     st.markdown(f"**M-Score:** `{m:.3f}` — :{color}[{risk}]")
     st.markdown(f"**LR Fraud Probability:** `{row['lr_prob']:.1%}`")
-    st.markdown(f"**LR Prediction:** {'Fraud' if row['lr_pred'] == 1 else 'Clean'}")
+    st.markdown(f"**LR Prediction:** {'🚨 Fraud' if row['lr_pred'] == 1 else '✅ Clean'}")
 
     if row["scandal"]:
-        st.info(f"**Scandal:** {row['scandal']}")
+        st.info(f"📋 **Scandal:** {row['scandal']}")
 
 with col_right:
     # Radar / bar chart of the 8 features
@@ -136,9 +136,8 @@ display_df["M-Score"] = display_df["M-Score"].map("{:.3f}".format)
 display_df["LR Prob"] = display_df["LR Prob"].map("{:.1%}".format)
 
 def highlight_fraud(row):
-    if row["Actual Fraud"] == 1:
-        return ["background-color: #fde8e8; color: #000000"] * len(row)
-    return [""] * len(row)
+    color = "background-color: #fde8e8" if row["Actual Fraud"] == 1 else ""
+    return [color] * len(row)
 
 st.dataframe(
     display_df.style.apply(highlight_fraud, axis=1),

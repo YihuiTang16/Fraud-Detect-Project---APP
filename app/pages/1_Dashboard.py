@@ -136,10 +136,9 @@ display_df["M-Score"] = display_df["M-Score"].map("{:.3f}".format)
 display_df["LR Prob"] = display_df["LR Prob"].map("{:.1%}".format)
 
 def highlight_fraud(row):
-    if row["is_fraud"] == 1:
-        return ["background-color: #f8d7da; color: #000000"] * len(row)
-    else:
-        return [""] * len(row)
+    if row["Actual Fraud"] == 1:
+        return ["background-color: #fde8e8; color: #000000"] * len(row)
+    return [""] * len(row)
 
 st.dataframe(
     display_df.style.apply(highlight_fraud, axis=1),

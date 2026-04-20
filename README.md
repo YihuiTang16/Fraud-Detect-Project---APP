@@ -2,8 +2,11 @@
 
 This project is a simple Streamlit app that tries to detect potential financial fraud using accounting ratios (Beneish M-score) and a basic machine learning model.
 
-I also added a small interactive game where users can guess whether a company is fraudulent or not, and then compare their answers with the model.
+Added a small interactive game where users can guess whether a company is fraudulent or not, and then compare their answers with the model.
 
+This tool evaluates potential financial reporting risk using SEC filing data and accounting-based indicators.
+
+It is designed as a screening tool rather than a definitive fraud detection system. The current version uses a curated sample of firms to highlight differences between known fraud cases and benchmark companies.
 ---
 
 ## How to Run

@@ -1,124 +1,143 @@
 # Financial Fraud Detection Web App
+**BA870-AC820 | Spring 2026**
 
-This project is a simple Streamlit app that tries to detect potential financial fraud using accounting ratios (Beneish M-score) and a basic machine learning model.
+A multi-page Streamlit app that detects potential financial statement manipulation
+using the Beneish M-Score and Logistic Regression, with a gamified interface that
+benchmarks human intuition against the model.
 
-Added a small interactive game where users can guess whether a company is fraudulent or not, and then compare their answers with the model.
-
-This tool evaluates potential financial reporting risk using SEC filing data and accounting-based indicators.
-
-It is designed as a screening tool rather than a definitive fraud detection system. The current version uses a curated sample of firms to highlight differences between known fraud cases and benchmark companies.
 ---
 
-## How to Run
+## Quick Start
 
 ```bash
+# 1. Install dependencies
 pip install -r requirements.txt
-streamlit run streamlit_app.py
+
+# 2. Run the app (from this folder)
+streamlit run app/main.py
 ```
 
-The app will open at `http://localhost:8501`.
+The app opens at `http://localhost:8501`. Use the sidebar to navigate between pages.
 
 ---
 
-## What I Built
+## What This App Does
 
-The project has three main parts:
+This app applies the **Beneish M-Score** — an accounting-based model from the
+finance literature — to real company filings to flag potential earnings manipulation.
+It also includes a game that lets you test your own fraud-detection judgment against
+the model.
 
-* **Dashboard**
-  Shows fraud scores, key financial ratios, and lets you explore each company
-
-* **Game page**
-  You guess whether a company is fraudulent (10 rounds), then see how the model did
-
-* **Insights page**
-  Compares human vs. model accuracy and highlights common mistakes
+| Page | Description |
+|------|-------------|
+| **Home** | Dataset overview and model accuracy |
+| **Dashboard** | M-score scatter plot, per-company deep dive, feature importance |
+| **Game** | 10-round interactive game: guess fraud vs. clean, then compare with the model |
+| **Insights** | Your accuracy vs. model accuracy, mistake analysis, confidence calibration |
 
 ---
 
-## Data
+## Data Source
 
-The data comes from the SEC EDGAR XBRL API (official company filings).
+**Source:** [SEC EDGAR XBRL API](https://www.sec.gov/developer) — free, no login required.
 
-I manually constructed a small dataset (~30 companies):
+Financial statement data (10-K annual filings) was pulled from
+`data.sec.gov/api/xbrl/companyfacts/` for 30 companies. Fraud labels are based
+on confirmed SEC enforcement actions (Accounting and Auditing Enforcement Releases
+and litigation releases).
 
-* 8 confirmed fraud cases (based on SEC enforcement actions)
-* 22 non-fraud companies (mostly large public firms)
+| Category | Count |
+|----------|-------|
+| Confirmed fraud cases | 8 |
+| Clean benchmark firms (S&P 500) | 22 |
+| **Total** | **30** |
 
-The dataset is saved in:
+**Fraud cases:** KHC (Kraft Heinz), GRPN (Groupon), UAA (Under Armour), GE,
+MDXG (MiMedx), BHC (Bausch Health), LL (Lumber Liquidators), LCI (Lannett).
+
+The dataset is pre-built and included at `data/fraud_dataset_real.csv`.
+
+---
+
+## Model Summary
+
+### Beneish M-Score (rule-based baseline)
+
+Formula from Beneish (1999):
 
 ```
-data/fraud_dataset_real.csv
+M = −4.84 + 0.920·DSRI + 0.528·GMI + 0.404·AQI + 0.892·SGI
+         + 0.115·DEPI − 0.172·SGAI + 4.679·TATA − 0.327·LVGI
 ```
 
----
+| Feature | Description |
+|---------|-------------|
+| DSRI | Days Sales in Receivables Index |
+| GMI | Gross Margin Index |
+| AQI | Asset Quality Index |
+| SGI | Sales Growth Index |
+| DEPI | Depreciation Index |
+| SGAI | SG&A Expense Index |
+| TATA | Total Accruals to Total Assets |
+| LVGI | Leverage Index |
 
-## Model
+**Threshold:** M > −2.22 → likely manipulator
 
-### 1. Beneish M-Score
+### Logistic Regression (ML model)
 
-I used the standard Beneish M-score formula from finance literature.
-The idea is: if the score is higher than −2.22, the company might be manipulating earnings.
+Trained on the 8 Beneish features with StandardScaler normalization.
+5-fold stratified cross-validation. CV accuracy: ~73% on real data.
 
-### 2. Logistic Regression
+### Key Finding
 
-I also trained a simple logistic regression model using the same features.
-Used standard scaling + cross-validation.
-
-Result:
-
-* Accuracy is around **70%+**
-* Not perfect (which is expected for real-world data)
-
----
-
-## What I Found (Important)
-
-One interesting thing is that many fraud companies in this dataset are **not flagged by M-score**.
-
-This is probably because:
-
-* M-score mainly detects revenue/receivables manipulation
-* But modern fraud cases are more complex (non-GAAP metrics, reserves, disclosures, etc.)
-
-So the model works, but has clear limitations.
+Most confirmed fraud companies in this dataset score *below* the −2.22 M-Score
+threshold because their fraud types (non-GAAP metric manipulation, reserve
+understatement, pricing disclosure) differ from the receivables/revenue manipulation
+the M-Score was calibrated to detect. This limitation is documented and analyzed
+in the modeling notebook.
 
 ---
 
 ## Project Structure
 
 ```
-app/            → Streamlit app
-data/           → dataset
-notebooks/      → modeling notebook
-requirements.txt
-README.md
+submission/
+├── app/
+│   ├── main.py                  # Home page + model loader
+│   ├── pages/
+│   │   ├── 1_Dashboard.py       # Analytics dashboard
+│   │   ├── 2_Game.py            # Human vs. model game
+│   │   └── 3_Insights.py        # Results and insights
+│   └── utils/
+│       ├── features.py          # Beneish M-score formula
+│       ├── data_loader.py       # Dataset loader (real CSV → seed fallback)
+│       └── models.py            # Logistic Regression training + prediction
+├── data/
+│   └── fraud_dataset_real.csv   # Pre-built dataset from SEC EDGAR
+├── notebooks/
+│   └── fraud_detection_modeling.ipynb   # Full ML pipeline (Colab-friendly)
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## Notebook
+## Modeling Notebook
 
-The notebook (`fraud_detection_modeling.ipynb`) shows the full process:
+`notebooks/fraud_detection_modeling.ipynb` is fully executable on Google Colab
+(no local files required — real data is embedded inline as a fallback).
 
-* data preparation
-* feature calculation
-* model training
-* evaluation
-
-It can run on Colab.
+Covers: EDA → M-Score computation → Logistic Regression → Evaluation →
+Feature Importance → Key Findings.
 
 ---
 
-## Tech Used
+## Tech Stack
 
-* Python
-* pandas
-* scikit-learn
-* streamlit
-* plotly
-
----
+- Python 3.10+
+- Streamlit, pandas, scikit-learn, plotly, numpy
 
 ## Reference
 
-Beneish (1999), *The Detection of Earnings Manipulation*
+Beneish, M. D. (1999). *The Detection of Earnings Manipulation.*
+Financial Analysts Journal, 55(5), 24–36.

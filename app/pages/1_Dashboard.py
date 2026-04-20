@@ -99,7 +99,7 @@ with col_left:
     st.markdown(f"**LR Prediction:** {'Fraud' if row['lr_pred'] == 1 else 'Clean'}")
 
     if row["scandal"]:
-        st.info(f"📋 **Scandal:** {row['scandal']}")
+        st.info(f"**Scandal:** {row['scandal']}")
 
 with col_right:
     # Radar / bar chart of the 8 features
